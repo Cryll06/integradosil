@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Admin{% endblock %}
+
+{% block content %}
+<h2>Panel de Administración de NUAM</h2>
+<p>Resumen general del sistema</p>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ total_calificaciones }}</h5>
+                <p class="card-text">Calificaciones Totales</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ total_documentos }}</h5>
+                <p class="card-text">Documentos Subidos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ total_usuarios }}</h5>
+                <p class="card-text">Usuarios Activos</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="mt-4">Registro Reciente (Bitácora)</h4>
+<div class="card">
+    <div class="card-body">
+        <ul class="list-group list-group-flush">
+            {% for log in ultimas_acciones %}
+                <li class="list-group-item">
+                    <span class="badge bg-secondary">{{ log.fecha|date:"d/m/Y H:i" }}</span>
+                    <strong>{{ log.usuario_accion }}</strong> realizó <strong>{{ log.accion }}</strong>: {{ log.detalle }}
+                </li>
+            {% empty %}
+                <li class="list-group-item">No hay acciones registradas</li>
+            {% endfor %}
+        </ul>
+        <a href="{% url 'admin_auditoria' %}" class="btn btn-primary mt-3">Ver Bitácora Completa</a>
+    </div>
+</div>
+{% endblock %}

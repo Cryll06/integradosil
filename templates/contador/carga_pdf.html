@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load bootstrap5 %}
+{% block title %}Carga de Documento OCR{% endblock %}
+
+{% block content %}
+<h2>Carga de PDF con OCR</h2>
+<p>Suba un documento PDF para subir los Datos</p>
+
+<div class="alert alert-warning">
+    <h4 class="alert-heading">Nota sobre Extracción OCR</h4>
+    <p>Esta función es para documentos digitalmente generados</p>
+    <p>El sistema intentará extraer datos si el PDF contiene líneas de texto claras, por ejemplo: <code>Corredor: Mi Corredora SA</code>, <code>Año: 2025</code> y <code>F8: 0.1</code></p>
+    <p class="mb-0">Los datos extraídos se cargarán en el formulario de registro manual para su verificación obligatoria</p>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button type="submit" class="btn btn-info">Procesar PDF</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

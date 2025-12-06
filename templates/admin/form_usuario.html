@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load bootstrap5 %}
+{% block title %}{{ accion }} Usuario{% endblock %}
+
+{% block content %}
+<h2>{{ accion }} Usuario</h2>
+<p>
+    {% if accion == 'Crear' %}
+    Crear nuevo rol/usuario
+    {% else %}
+    Editando el rol para <strong>{{ usuario_obj.username }}</strong>
+    {% endif %}
+</p>
+
+<div class="card">
+    <div class="card-body">
+        {% if accion == 'Crear' %}
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button type="submit" class="btn btn-primary">{{ accion }}</button>
+            <a href="{% url 'admin_usuarios' %}" class="btn btn-secondary">Cancelar</a>
+        </form>
+        {% else %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="rol" class="form-label">Rol</label>
+                <select name="rol" id="rol" class="form-select">
+                    <option value="ADMIN" {% if usuario_obj.perfil.rol == 'ADMIN' %}selected{% endif %}>Administrador de Negocio</option>
+                    <option value="CONTADOR" {% if usuario_obj.perfil.rol == 'CONTADOR' %}selected{% endif %}>Contador / Operador</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">{{ accion }}</button>
+            <a href="{% url 'admin_usuarios' %}" class="btn btn-secondary">Cancelar</a>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

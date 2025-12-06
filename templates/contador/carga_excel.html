@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load bootstrap5 %}
+{% load static %}
+{% block title %}Carga Masiva de Datos{% endblock %}
+
+{% block content %}
+<h2>Carga Masiva desde Excel</h2>
+<p>Suba un archivo Excel para crear múltiples calificaciones de una vez</p>
+
+<div class="alert alert-info">
+    <h4 class="alert-heading">Requerimientos de Formato</h4>
+    <p>El archivo Excel debe tener un formato específico para ser procesado</p>
+    <hr>
+    <a href="{% static 'plantilla_excel.xlsx' %}" class="btn btn-success" download>
+        Descargar Plantilla Oficial (Excel)
+    </a>
+    <p class="mt-2 mb-0">
+        Las cabeceras de la plantilla (incluyendo <strong>Anio</strong>) deben ser respetadas
+        Cualquier error en una fila (ej Suma de factores > 10) cancelará la carga completa
+    </p>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button type="submit" class="btn btn-primary">Procesar Archivo</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

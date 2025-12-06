@@ -1,0 +1,10 @@
+django~=4.2.0
+cx_Oracle
+pandas
+openpyxl 
+pillow 
+python-dotenv 
+django-bootstrap-v5 
+pytesseract 
+pdf2image 
+

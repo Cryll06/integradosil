@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load bootstrap5 %}
+{% block title %}{{ accion }} Calificación{% endblock %}
+
+{% block content %}
+<h2>{{ accion }} Calificación Manual</h2>
+<p>
+    {% if accion == 'Crear (Validar OCR)' %}
+    Datos extraídos del PDF Por favor, verifique y guarde
+    {% else %}
+    Complete el formulario para registrar una calificación
+    {% endif %}
+</p>
+
+<div class="card">
+    <div class="card-body">
+
+        <form method="post" action="{% if documento_id %}{% url 'calificacion_guardar_ocr' %}{% else %}{% url 'calificacion_crear' %}{% endif %}" novalidate>
+            {% csrf_token %}
+            
+
+            {% if documento_id %}
+                <input type="hidden" name="documento_fuente_id" value="{{ documento_id }}">
+            {% endif %}
+
+            {% bootstrap_form form %}
+            
+            <button type="submit" class="btn btn-primary">{{ accion }}</button>
+            <a href="{% url 'contador_dashboard' %}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

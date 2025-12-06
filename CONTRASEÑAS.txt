@@ -1,0 +1,68 @@
+URLS ACCESIBLES:
+
+PANEL DE CONTROL SUPERADMIN:
+
+http://127.0.0.1:8000/superadmin/
+
+DASHBOARD DEL ADMIN (SOLO ACCESIBLE CON ESTE):
+
+http://127.0.0.1:8000/admin/dashboard/
+
+CONTADOR/TRABAJADOR:
+
+Usuario: contador
+Contraseña: contador123
+
+Usuario: Pruebausuario
+Contraseña: prueba123
+
+ADMIN:
+
+Usuario: admin
+Contraseña: admin123
+
+
+PARA CREAR SUPERADMIN:
+
+docker-compose exec web python manage.py createsuperuser
+
+SUPERADMIN:
+
+Usuario: superadmin
+Contraseña: superadmin123
+
+
+COMO INICIAR SESION EN SQL DEVELOPER?
+
+Usar estos datos exactos:
+
+    Usuario: SYSTEM
+
+    Contraseña: contraseñasql123
+
+    Nombre de host: localhost
+
+    Puerto: 1522 o 1521
+
+
+    Haz clic en la opción "Nombre del Servicio" (no en SID).
+    Escribir : XEPDB1 
+
+
+COMANDOS EN CASO DE ERROR:
+
+docker-compose down -v
+
+docker system prune -a --force
+
+docker-compose up -d db
+
+docker-compose logs -f db
+
+docker-compose up --build web (para levantar finalmente todo)
+
+
+
+Al hacer esto volver a crear el superadmin:
+
+docker-compose exec web python manage.py createsuperuser
