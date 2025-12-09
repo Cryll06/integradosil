@@ -2,61 +2,181 @@
 {% block title %}Gestión de Calificaciones{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Gestión de Calificaciones</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <a href="{% url 'calificacion_crear' %}" class="btn btn-primary">Registrar Nueva</a>
-        <a href="{% url 'carga_masiva_excel' %}" class="btn btn-success">Carga Masiva (Excel)</a>
-        <a href="{% url 'carga_pdf_ocr' %}" class="btn btn-info">Carga (OCR)</a>
+        <h2 class="fw-bold text-dark"><i class="bi bi-speedometer2 me-2"></i>Dashboard Operativo</h2>
+        <p class="text-muted mb-0">Gestión y análisis de registros tributarios</p>
+    </div>
+    <div class="btn-group shadow-sm">
+        <a href="{% url 'calificacion_crear' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nueva</a>
+        <a href="{% url 'carga_masiva_excel' %}" class="btn btn-success"><i class="bi bi-file-earmark-excel"></i> Excel</a>
+        <a href="{% url 'carga_pdf_ocr' %}" class="btn btn-warning text-dark"><i class="bi bi-eye"></i> OCR</a>
+        <a href="{% url 'exportar_excel' %}" class="btn btn-secondary"><i class="bi bi-download"></i> Exportar</a>
     </div>
 </div>
-<p>Listado de calificaciones registradas por usted</p>
 
-<div class="table-responsive">
-    <table class="table table-striped table-hover">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Corredor</th>
-                <th>Año</th>
-                <th>Monto</th>
-                <th>Suma Factores</th>
-                <th>Respaldo</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for cal in calificaciones %}
-            <tr>
-                <td>{{ cal.id }}</td>
-                <td>{{ cal.corredor }}</td>
-                <td>{{ cal.anio_tributario }}</td>
-                <td>${{ cal.monto|floatformat:0 }}</td>
-                
-                <td>{{ cal.suma_total_factores }}</td>
-                
-                <td>
-                    {% if cal.documento_respaldo %}
-                        <a href="{{ cal.documento_respaldo.archivo.url }}" target="_blank">
-                            Ver ({{ cal.documento_respaldo.tipo_documento }})
-                        </a>
-                    {% else %}
-                        N/A
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{% url 'calificacion_editar' cal.pk %}" class="btn btn-sm btn-warning">
-                        Editar
-                    </a>
-                    <a href="{% url 'calificacion_eliminar' cal.pk %}" class="btn btn-sm btn-danger">
-                        Eliminar
-                    </a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="7" class="text-center">No ha registrado calificaciones</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white fw-bold"><i class="bi bi-search me-2"></i>Filtros de Búsqueda</div>
+            <div class="card-body d-flex align-items-center">
+                <form method="get" class="row g-2 w-100">
+                    <div class="col-md-6">
+                        <input type="text" name="q" class="form-control" placeholder="Buscar por Corredor..." value="{{ search_query }}">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" name="anio" class="form-control" placeholder="Año (Ej: 2025)" value="{{ anio_filter }}">
+                    </div>
+                    <div class="col-md-3 d-grid">
+                        <button type="submit" class="btn btn-outline-primary"><i class="bi bi-funnel"></i> Filtrar</button>
+                    </div>
+                </form>
+                {% if search_query or anio_filter %}
+                    <a href="{% url 'contador_dashboard' %}" class="btn btn-link text-danger ms-2" title="Limpiar"><i class="bi bi-x-circle"></i></a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card bg-primary text-white shadow-sm h-100">
+            <div class="card-body text-center d-flex flex-column justify-content-center">
+                <h6 class="text-uppercase opacity-75">Registros Visibles</h6>
+                <h1 class="display-4 fw-bold">{{ page_obj.paginator.count }}</h1>
+            </div>
+        </div>
+    </div>
 </div>
+
+{% if labels_grafico %}
+<div class="card shadow-sm mb-4 border-0">
+    <div class="card-header bg-white fw-bold text-primary d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-bar-chart-fill me-2"></i>Resumen de Montos por Año Tributario</span>
+        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGrafico" aria-expanded="false" aria-controls="collapseGrafico">
+            <i class="bi bi-arrows-expand"></i> Mostrar/Ocultar
+        </button>
+    </div>
+    
+    <div id="collapseGrafico" class="collapse">
+        <div class="card-body">
+            <div style="height: 250px;">
+                <canvas id="miGrafico"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="card p-0 shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Corredor</th>
+                    <th>Año</th>
+                    <th>Monto</th>
+                    <th>Factores (Suma)</th>
+                    <th>Respaldo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cal in page_obj %}
+                <tr>
+                    <td class="fw-bold">{{ cal.corredor }}</td>
+                    <td><span class="badge bg-light text-dark border">{{ cal.anio_tributario }}</span></td>
+                    <td class="text-success fw-bold">${{ cal.monto|floatformat:0 }}</td>
+                    
+                    <td>
+                        <div class="d-flex align-items-center" title="Suma total: {{ cal.suma_total_factores }}">
+                            <span class="me-2 small text-muted">{{ cal.suma_total_factores }}</span>
+                            <div class="progress flex-grow-1" style="height: 4px; width: 50px;">
+                                <div class="progress-bar {% if cal.suma_total_factores > 1 %}bg-danger{% else %}bg-info{% endif %}" 
+                                     role="progressbar" 
+                                     style="width: {{ cal.suma_total_factores }}00%"></div>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td>
+                        {% if cal.documento_respaldo %}
+                            <a href="{{ cal.documento_respaldo.archivo.url }}" target="_blank" class="badge bg-primary text-decoration-none">
+                                <i class="bi bi-paperclip"></i> {{ cal.documento_respaldo.tipo_documento }}
+                            </a>
+                        {% else %}
+                            <span class="badge bg-secondary">Manual</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'calificacion_editar' cal.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'calificacion_eliminar' cal.pk %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Estás seguro?');"><i class="bi bi-trash"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center py-5 text-muted">No se encontraron resultados para tu búsqueda.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<nav class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ search_query }}&anio={{ anio_filter }}">Anterior</a>
+        </li>
+        {% endif %}
+        
+        <li class="page-item disabled"><a class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</a></li>
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ search_query }}&anio={{ anio_filter }}">Siguiente</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('miGrafico');
+        
+        // Datos que vienen desde Django (views.py)
+        const labels = {{ labels_grafico|safe }};
+        const data = {{ data_grafico|safe }};
+
+        if (ctx && labels.length > 0) {
+            new Chart(ctx, {
+                type: 'bar', 
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Monto Total ($)',
+                        data: data,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)', 
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f0f0f0' }
+                        },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { display: false } 
+                    }
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}

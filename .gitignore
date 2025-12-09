@@ -1,1 +1,29 @@
+# --- Seguridad (CRÍTICO) ---
 .env
+*.env
+secrets.json
+
+# --- Python y Django ---
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/
+db.sqlite3
+local_settings.py
+
+# --- Archivos Multimedia (Uploads) ---
+# Usualmente no subimos los PDFs/Excel que prueban los usuarios, solo la estructura
+media/
+!media/.gitkeep
+
+# --- Docker ---
+# Ignoramos datos de base de datos si estuvieran locales
+oracle_data/
+
+# --- IDEs y Sistema Operativo ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

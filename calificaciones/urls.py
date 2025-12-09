@@ -22,5 +22,6 @@ urlpatterns = [
     path('calificacion/eliminar/<int:pk>/', views.calificacion_eliminar, name="calificacion_eliminar"),
     path('carga-masiva-excel/', views.carga_masiva_excel, name="carga_masiva_excel"),
     path('carga-pdf-ocr/', views.carga_pdf_ocr, name="carga_pdf_ocr"),
-    path('calificacion/guardar-ocr/', views.calificacion_guardar_ocr, name="calificacion_guardar_ocr")
+    path('calificacion/guardar-ocr/', views.calificacion_guardar_ocr, name="calificacion_guardar_ocr"),
+    path('exportar-excel/', views.exportar_calificaciones_excel, name="exportar_excel"),
 ]

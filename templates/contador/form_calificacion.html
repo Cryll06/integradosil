@@ -15,10 +15,17 @@
 <div class="card">
     <div class="card-body">
 
-        <form method="post" action="{% if documento_id %}{% url 'calificacion_guardar_ocr' %}{% else %}{% url 'calificacion_crear' %}{% endif %}" novalidate>
+        {# Lógica para determinar a dónde enviar el formulario #}
+        {% if accion == 'Editar' %}
+            <form method="post" enctype="multipart/form-data" novalidate>
+        {% elif documento_id %}
+            <form method="post" action="{% url 'calificacion_guardar_ocr' %}" enctype="multipart/form-data" novalidate>
+        {% else %}
+            <form method="post" action="{% url 'calificacion_crear' %}" enctype="multipart/form-data" novalidate>
+        {% endif %}
+
             {% csrf_token %}
             
-
             {% if documento_id %}
                 <input type="hidden" name="documento_fuente_id" value="{{ documento_id }}">
             {% endif %}

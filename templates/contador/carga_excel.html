@@ -7,16 +7,28 @@
 <h2>Carga Masiva desde Excel</h2>
 <p>Suba un archivo Excel para crear múltiples calificaciones de una vez</p>
 
+{% if errores %}
+<div class="alert alert-danger shadow-sm">
+    <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-2"></i>No se pudo procesar el archivo</h4>
+    <p>Se encontraron los siguientes errores. Por favor corríjalos e intente subir el archivo nuevamente.</p>
+    <hr>
+    <ul class="mb-0 overflow-auto" style="max-height: 200px;">
+        {% for error in errores %}
+        <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
 <div class="alert alert-info">
     <h4 class="alert-heading">Requerimientos de Formato</h4>
     <p>El archivo Excel debe tener un formato específico para ser procesado</p>
     <hr>
     <a href="{% static 'plantilla_excel.xlsx' %}" class="btn btn-success" download>
-        Descargar Plantilla Oficial (Excel)
+        <i class="bi bi-download"></i> Descargar Plantilla Oficial (Excel)
     </a>
     <p class="mt-2 mb-0">
-        Las cabeceras de la plantilla (incluyendo <strong>Anio</strong>) deben ser respetadas
-        Cualquier error en una fila (ej Suma de factores > 10) cancelará la carga completa
+        Las cabeceras de la plantilla (incluyendo <strong>Anio</strong>) deben ser respetadas.
     </p>
 </div>
 
@@ -26,6 +38,7 @@
             {% csrf_token %}
             {% bootstrap_form form %}
             <button type="submit" class="btn btn-primary">Procesar Archivo</button>
+            <a href="{% url 'contador_dashboard' %}" class="btn btn-secondary">Volver</a>
         </form>
     </div>
 </div>

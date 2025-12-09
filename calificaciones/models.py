@@ -78,20 +78,21 @@ class Calificacion(models.Model):
         ordering = ['-fecha_creacion']
 
     def clean(self):
-
         factors = [
             self.f8, self.f9, self.f10, self.f11, self.f12, self.f13,
             self.f14, self.f15, self.f16, self.f17, self.f18, self.f19
         ]
+        
         suma_factores = sum(factor or Decimal('0.0') for factor in factors)
         
-        if suma_factores > Decimal('1.0'):
-            raise ValidationError(f"Error de Negocio: La suma de factores ({suma_factores}) excede el límite de 10")
+        limite = Decimal('1.0')
+        tolerancia = Decimal('0.0001')
 
+        if suma_factores > (limite + tolerancia):
+            raise ValidationError(f"Error de Negocio: La suma de factores ({suma_factores:.4f}) excede el límite de 1.0")
 
         valores_numericos = factors + [self.monto]
         
-
         if any(v < Decimal('0.0') for v in valores_numericos if v is not None):
              raise ValidationError("Error de Integridad: Los montos y factores no pueden ser valores negativos")
         
