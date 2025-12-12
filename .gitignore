@@ -14,12 +14,10 @@ db.sqlite3
 local_settings.py
 
 # --- Archivos Multimedia (Uploads) ---
-# Usualmente no subimos los PDFs/Excel que prueban los usuarios, solo la estructura
 media/
 !media/.gitkeep
 
 # --- Docker ---
-# Ignoramos datos de base de datos si estuvieran locales
 oracle_data/
 
 # --- IDEs y Sistema Operativo ---

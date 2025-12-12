@@ -3,7 +3,6 @@
 from django.contrib import admin
 from .models import Perfil, Calificacion, DocumentoFuente, Auditoria
 
-# Registramos los modelos para poder ver/editar los datos desde la interfaz del superadmin
 admin.site.register(Perfil)
 admin.site.register(Calificacion)
 admin.site.register(DocumentoFuente)

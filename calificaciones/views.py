@@ -128,10 +128,8 @@ def admin_editar_usuario(request, user_id):
 
 @contador_requerido
 def contador_dashboard(request):
-    # 1. Base QuerySet
     calificaciones_list = Calificacion.objects.filter(creado_por=request.user).order_by('-fecha_creacion')
 
-    # 2. Filtros
     search_query = request.GET.get('q', '')
     anio_filter = request.GET.get('anio', '')
 
@@ -141,7 +139,6 @@ def contador_dashboard(request):
     if anio_filter:
         calificaciones_list = calificaciones_list.filter(anio_tributario=anio_filter)
 
-    # 3. Datos Gráfico
     datos_grafico = Calificacion.objects.filter(creado_por=request.user) \
         .values('anio_tributario') \
         .annotate(total_monto=Sum('monto')) \
@@ -150,7 +147,6 @@ def contador_dashboard(request):
     labels_grafico = [str(d['anio_tributario']) for d in datos_grafico]
     data_grafico = [float(d['total_monto']) for d in datos_grafico]
 
-    # 4. Paginación
     paginator = Paginator(calificaciones_list, 10) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -296,11 +292,9 @@ def carga_masiva_excel(request):
         if form.is_valid():
             archivo_excel = request.FILES['archivo_excel']
             
-            # Leemos el Excel antes de crear nada en BD para validar
             try:
                 df = pd.read_excel(archivo_excel)
                 
-                # 1. Validación de columnas
                 columnas_requeridas = [
                     'Corredor', 'Anio', 'Monto', 
                     'F8', 'F9', 'F10', 'F11', 'F12', 'F13',
@@ -311,7 +305,6 @@ def carga_masiva_excel(request):
                         messages.error(request, f"Falta la columna '{col}' en el Excel.")
                         return render(request, 'contador/carga_excel.html', {'form': form})
                 
-                # 2. Limpieza de datos
                 columnas_a_limpiar = ['Monto', 'F8', 'F9', 'F10', 'F11', 'F12', 'F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19']
                 for col in columnas_a_limpiar:
                     df[col] = df[col].fillna(0).astype(str).str.replace(',', '.')
@@ -319,12 +312,11 @@ def carga_masiva_excel(request):
                 
                 df['Anio'] = pd.to_numeric(df['Anio'], errors='coerce').fillna(0).astype(int)
 
-                # 3. Validación fila por fila (sin guardar)
                 lista_validos = []
                 lista_errores = []
 
                 for index, row in df.iterrows():
-                    fila_num = index + 2 # Excel header es 1
+                    fila_num = index + 2 
                     
                     cal = Calificacion(
                         corredor=row['Corredor'],
@@ -338,21 +330,18 @@ def carga_masiva_excel(request):
                     )
                     
                     try:
-                        cal.clean() # Validamos lógica de negocio (Suma > 1, negativos)
+                        cal.clean() # 
                         lista_validos.append(cal)
                     except ValidationError as e:
                         lista_errores.append(f"Fila {fila_num}: {e.messages[0]}")
                     except Exception as e:
                         lista_errores.append(f"Fila {fila_num}: Error inesperado ({str(e)})")
 
-                # 4. Decisión Final
                 if lista_errores:
-                    # Si hay errores, NO guardamos nada y mostramos la lista
                     messages.error(request, "El archivo contiene errores. No se importó ningún registro.")
                     return render(request, 'contador/carga_excel.html', {'form': form, 'errores': lista_errores})
                 
                 else:
-                    # Si todo está perfecto, creamos el documento y guardamos masivamente
                     with transaction.atomic():
                         doc = DocumentoFuente.objects.create(
                             archivo=archivo_excel,
@@ -361,7 +350,6 @@ def carga_masiva_excel(request):
                             subido_por=request.user
                         )
                         
-                        # Asignamos el documento a todas las instancias
                         for cal in lista_validos:
                             cal.documento_respaldo = doc
                         

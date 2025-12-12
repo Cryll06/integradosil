@@ -4,7 +4,6 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 WORKDIR /app
 
-# Instalamos solo Tesseract y utilidades básicas (Postgres no necesita cliente externo aquí)
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     tesseract-ocr-spa \
@@ -18,5 +17,4 @@ COPY . .
 
 EXPOSE 8000
 
-# El comando de inicio es igual
 CMD ["sh", "-c", "python wait_for_db.py && python manage.py makemigrations calificaciones && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
