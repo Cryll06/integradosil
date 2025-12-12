@@ -53,11 +53,12 @@ WSGI_APPLICATION = 'nuam_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.oracle',
-        'NAME': 'db:1521/XEPDB1',
-        'USER': os.getenv('APP_USER'),
-        'PASSWORD': os.getenv('APP_USER_PASSWORD'),
-
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST', 'db'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
 
